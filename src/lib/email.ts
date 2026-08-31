@@ -1,6 +1,6 @@
 /**
  * Simple HTTP-based Email Dispatcher (No Nodemailer / No SMTP credentials)
- * Sends notification emails directly to your Gmail using modern HTTP REST APIs.
+ * Sends notification emails directly to your Gmail using Web3Forms / Resend HTTP REST API.
  */
 
 interface SendContactEmailParams {
@@ -15,14 +15,48 @@ export async function sendEmailNotification({
   email,
   subject,
   message,
-}: SendContactEmailParams): Promise<boolean> {
+}: SendContactEmailParams): Promise<{ success: boolean; provider?: string; error?: string }> {
   const recipientEmail =
     process.env.CONTACT_NOTIFICATION_EMAIL ||
     process.env.DEFAULT_ADMIN_EMAIL ||
     'dinuwaperera123@gmail.com';
 
-  // 1. Resend REST API (Recommended: 100 emails/day free, zero packages, instant delivery)
+  const web3FormsKey = process.env.WEB3FORMS_ACCESS_KEY;
   const resendApiKey = process.env.RESEND_API_KEY;
+
+  // 1. Web3Forms REST API (Direct Gmail Delivery, Zero Domain Restrictions)
+  if (web3FormsKey && web3FormsKey.trim() !== '') {
+    try {
+      const res = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+        body: JSON.stringify({
+          access_key: web3FormsKey.trim(),
+          name,
+          email,
+          subject: `🔔 [Portfolio Inquiry] ${subject} - from ${name}`,
+          message: `Sender Name: ${name}\nSender Email: ${email}\nSubject: ${subject}\n\nMessage:\n${message}`,
+          from_name: `${name} (Portfolio Contact)`,
+          replyto: email,
+        }),
+      });
+
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data.success) {
+        console.log('✅ [Email Notification] Dispatched successfully via Web3Forms to your Gmail');
+        return { success: true, provider: 'Web3Forms' };
+      } else {
+        console.error('❌ [Email Notification] Web3Forms response error:', data);
+      }
+    } catch (err: any) {
+      console.error('❌ [Email Notification] Web3Forms network error:', err?.message);
+    }
+  }
+
+  // 2. Resend REST API (Backup)
   if (resendApiKey && resendApiKey.trim() !== '') {
     try {
       const res = await fetch('https://api.resend.com/emails', {
@@ -57,34 +91,17 @@ export async function sendEmailNotification({
         }),
       });
 
+      const data = await res.json().catch(() => ({}));
       if (res.ok) {
-        return true;
+        console.log('✅ [Email Notification] Dispatched successfully via Resend');
+        return { success: true, provider: 'Resend' };
+      } else {
+        console.error('❌ [Email Notification] Resend API error:', data);
       }
-    } catch (err) {
-      console.warn('Resend email notification failed:', err);
+    } catch (err: any) {
+      console.error('❌ [Email Notification] Resend network error:', err?.message);
     }
   }
 
-  // 2. Web3Forms REST API (Alternative zero-setup free service)
-  const web3FormsKey = process.env.WEB3FORMS_ACCESS_KEY;
-  if (web3FormsKey && web3FormsKey.trim() !== '') {
-    try {
-      const res = await fetch('https://api.web3forms.com/submit', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          access_key: web3FormsKey.trim(),
-          name,
-          email,
-          subject: `[Portfolio Inquiry] ${subject}`,
-          message,
-        }),
-      });
-      if (res.ok) return true;
-    } catch (err) {
-      console.warn('Web3Forms email notification failed:', err);
-    }
-  }
-
-  return false;
+  return { success: false, error: 'Email dispatch failed across all configured providers.' };
 }
