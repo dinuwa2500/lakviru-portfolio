@@ -30,8 +30,8 @@ export function HeroSection({ profile, featuredProject }: HeroSectionProps) {
               visible: {
                 opacity: 1,
                 transition: {
-                  staggerChildren: 0.12,
-                  delayChildren: 0.1,
+                  staggerChildren: 0.1,
+                  delayChildren: 0.05,
                 },
               },
             }}
@@ -40,12 +40,11 @@ export function HeroSection({ profile, featuredProject }: HeroSectionProps) {
             {/* Status Pill */}
             <motion.div
               variants={{
-                hidden: { opacity: 0, y: 16, filter: 'blur(4px)' },
+                hidden: { opacity: 0, y: 12 },
                 visible: {
                   opacity: 1,
                   y: 0,
-                  filter: 'blur(0px)',
-                  transition: { duration: 0.5, ease: TRANSITION_EASE },
+                  transition: { duration: 0.45, ease: TRANSITION_EASE },
                 },
               }}
             >
@@ -58,12 +57,11 @@ export function HeroSection({ profile, featuredProject }: HeroSectionProps) {
             {/* Name & Headline */}
             <motion.div
               variants={{
-                hidden: { opacity: 0, y: 20, filter: 'blur(6px)' },
+                hidden: { opacity: 0, y: 16 },
                 visible: {
                   opacity: 1,
                   y: 0,
-                  filter: 'blur(0px)',
-                  transition: { duration: 0.6, ease: TRANSITION_EASE },
+                  transition: { duration: 0.5, ease: TRANSITION_EASE },
                 },
               }}
               className="space-y-2"
@@ -83,12 +81,11 @@ export function HeroSection({ profile, featuredProject }: HeroSectionProps) {
             {/* Supporting Introduction Text */}
             <motion.p
               variants={{
-                hidden: { opacity: 0, y: 20, filter: 'blur(4px)' },
+                hidden: { opacity: 0, y: 16 },
                 visible: {
                   opacity: 1,
                   y: 0,
-                  filter: 'blur(0px)',
-                  transition: { duration: 0.6, ease: TRANSITION_EASE },
+                  transition: { duration: 0.5, ease: TRANSITION_EASE },
                 },
               }}
               className="text-base sm:text-lg text-zinc-600 dark:text-zinc-400 leading-relaxed max-w-xl"
@@ -99,11 +96,11 @@ export function HeroSection({ profile, featuredProject }: HeroSectionProps) {
             {/* Action CTAs with Magnetic Effect */}
             <motion.div
               variants={{
-                hidden: { opacity: 0, y: 20 },
+                hidden: { opacity: 0, y: 16 },
                 visible: {
                   opacity: 1,
                   y: 0,
-                  transition: { duration: 0.5, ease: TRANSITION_EASE },
+                  transition: { duration: 0.45, ease: TRANSITION_EASE },
                 },
               }}
               className="flex flex-wrap items-center gap-3 pt-2"
@@ -144,7 +141,7 @@ export function HeroSection({ profile, featuredProject }: HeroSectionProps) {
                 hidden: { opacity: 0 },
                 visible: {
                   opacity: 1,
-                  transition: { duration: 0.5, ease: TRANSITION_EASE },
+                  transition: { duration: 0.45, ease: TRANSITION_EASE },
                 },
               }}
               className="pt-4 border-t border-zinc-200/80 dark:border-zinc-800/80 flex flex-wrap items-center gap-4 text-xs text-zinc-500 dark:text-zinc-400"
@@ -182,9 +179,9 @@ export function HeroSection({ profile, featuredProject }: HeroSectionProps) {
 
           {/* Right Column: Senior Living Architecture Visualization */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.94 }}
+            initial={{ opacity: 0, scale: 0.96 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8, delay: 0.25, ease: TRANSITION_EASE }}
+            transition={{ duration: 0.6, delay: 0.15, ease: TRANSITION_EASE }}
             className="lg:col-span-6 flex justify-center lg:justify-end"
           >
             <LivingArchitecture featuredProject={featuredProject} />

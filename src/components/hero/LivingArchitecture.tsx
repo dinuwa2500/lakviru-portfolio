@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
+import { motion, useMotionValue, useSpring, useTransform, useReducedMotion } from 'framer-motion';
 import {
   Layers,
   Smartphone,
@@ -81,64 +81,59 @@ const NODES: NodeData[] = [
   {
     id: 'postgres',
     label: 'PostgreSQL',
-    subtitle: 'Prisma ORM & DB',
+    subtitle: 'Neon / Prisma ORM',
     category: 'Database',
     x: 120,
     y: 275,
-    color: '#10b981', // Emerald
+    color: '#3b82f6', // Blue
     icon: Database,
     connectedTo: ['rest', 'docker'],
   },
   {
     id: 'firebase',
     label: 'Firebase',
-    subtitle: 'Auth & Cloud',
+    subtitle: 'Cloud Auth & DB',
     category: 'Database',
     x: 420,
     y: 275,
     color: '#f97316', // Orange
     icon: Flame,
-    connectedTo: ['flutter', 'docker'],
+    connectedTo: ['flutter'],
   },
   {
     id: 'docker',
-    label: 'Docker',
-    subtitle: 'Containerization',
+    label: 'Docker Containers',
+    subtitle: 'Isolated Runtime',
     category: 'DevOps',
     x: 270,
     y: 335,
     color: '#06b6d4', // Cyan
     icon: Box,
-    connectedTo: ['postgres', 'firebase', 'rest'],
+    connectedTo: ['rest', 'postgres'],
   },
 ];
 
-interface EdgeData {
-  id: string;
-  from: string;
-  to: string;
-  path: string;
-  speed: number;
-}
-
-const EDGES: EdgeData[] = [
-  { id: 'e1', from: 'nextjs', to: 'rest', path: 'M 120 60 Q 140 115 180 165', speed: 3.2 },
-  { id: 'e2', from: 'flutter', to: 'rest', path: 'M 420 60 Q 300 110 180 165', speed: 3.8 },
-  { id: 'e3', from: 'flutter', to: 'firebase', path: 'M 420 60 Q 435 165 420 275', speed: 4.1 },
-  { id: 'e4', from: 'rest', to: 'sse', path: 'M 180 165 Q 270 145 360 165', speed: 2.8 },
-  { id: 'e5', from: 'sse', to: 'flutter', path: 'M 360 165 Q 390 110 420 60', speed: 3.5 },
-  { id: 'e6', from: 'rest', to: 'postgres', path: 'M 180 165 Q 140 220 120 275', speed: 3.0 },
-  { id: 'e7', from: 'postgres', to: 'docker', path: 'M 120 275 Q 185 320 270 335', speed: 4.5 },
-  { id: 'e8', from: 'firebase', to: 'docker', path: 'M 420 275 Q 355 320 270 335', speed: 4.2 },
-  { id: 'e9', from: 'rest', to: 'docker', path: 'M 180 165 Q 235 260 270 335', speed: 3.6 },
+// Connection Conduits with Bezier Curves
+const EDGES = [
+  { id: 'e-next-rest', from: 'nextjs', to: 'rest', path: 'M 120 60 C 130 110, 150 130, 180 165', speed: 3.2 },
+  { id: 'e-next-sse', from: 'nextjs', to: 'sse', path: 'M 120 60 C 200 90, 280 110, 360 165', speed: 3.8 },
+  { id: 'e-flut-rest', from: 'flutter', to: 'rest', path: 'M 420 60 C 340 90, 260 110, 180 165', speed: 3.5 },
+  { id: 'e-flut-sse', from: 'flutter', to: 'sse', path: 'M 420 60 C 410 110, 390 130, 360 165', speed: 3.1 },
+  { id: 'e-flut-fire', from: 'flutter', to: 'firebase', path: 'M 420 60 C 440 130, 440 200, 420 275', speed: 4.2 },
+  { id: 'e-rest-sse', from: 'rest', to: 'sse', path: 'M 180 165 C 240 155, 300 155, 360 165', speed: 2.8 },
+  { id: 'e-rest-pg', from: 'rest', to: 'postgres', path: 'M 180 165 C 160 210, 140 240, 120 275', speed: 3.0 },
+  { id: 'e-rest-doc', from: 'rest', to: 'docker', path: 'M 180 165 C 200 240, 230 290, 270 335', speed: 3.6 },
+  { id: 'e-pg-doc', from: 'postgres', to: 'docker', path: 'M 120 275 C 160 300, 210 320, 270 335', speed: 4.0 },
 ];
 
 export function LivingArchitecture({ featuredProject }: LivingArchitectureProps) {
   const containerRef = React.useRef<HTMLDivElement>(null);
   const [hoveredNode, setHoveredNode] = React.useState<string | null>(null);
   const [isVisible, setIsVisible] = React.useState(true);
+  const [isDesktop, setIsDesktop] = React.useState(false);
+  const shouldReduceMotion = useReducedMotion();
 
-  // Mouse Parallax Physics
+  // Mouse Parallax Physics (Desktop only)
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
 
@@ -146,11 +141,15 @@ export function LivingArchitecture({ featuredProject }: LivingArchitectureProps)
   const smoothX = useSpring(mouseX, springConfig);
   const smoothY = useSpring(mouseY, springConfig);
 
-  const rotateX = useTransform(smoothY, [-0.5, 0.5], [6, -6]);
-  const rotateY = useTransform(smoothX, [-0.5, 0.5], [-6, 6]);
+  const rotateX = useTransform(smoothY, [-0.5, 0.5], [5, -5]);
+  const rotateY = useTransform(smoothX, [-0.5, 0.5], [-5, 5]);
 
-  // IntersectionObserver: Pause heavy transforms when scrolled out of view
   React.useEffect(() => {
+    // Detect desktop pointer
+    const isFine = window.matchMedia('(pointer: fine) and (min-width: 768px)').matches;
+    setIsDesktop(isFine);
+
+    // IntersectionObserver: Pause heavy transforms when scrolled out of view
     const observer = new IntersectionObserver(
       ([entry]) => setIsVisible(entry.isIntersecting),
       { threshold: 0.1 }
@@ -164,7 +163,7 @@ export function LivingArchitecture({ featuredProject }: LivingArchitectureProps)
   const rafId = React.useRef<number | null>(null);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!containerRef.current) return;
+    if (!isDesktop || !containerRef.current) return;
     if (rafId.current !== null) {
       cancelAnimationFrame(rafId.current);
     }
@@ -202,6 +201,8 @@ export function LivingArchitecture({ featuredProject }: LivingArchitectureProps)
     );
   };
 
+  const showActiveAnimations = isVisible && isDesktop && !shouldReduceMotion;
+
   return (
     <div
       ref={containerRef}
@@ -212,26 +213,26 @@ export function LivingArchitecture({ featuredProject }: LivingArchitectureProps)
       {/* 3D Motion Stage */}
       <motion.div
         style={{
-          rotateX: isVisible ? rotateX : 0,
-          rotateY: isVisible ? rotateY : 0,
+          rotateX: showActiveAnimations ? rotateX : 0,
+          rotateY: showActiveAnimations ? rotateY : 0,
           transformStyle: 'preserve-3d',
         }}
-        className="relative rounded-3xl border border-zinc-200/80 dark:border-zinc-800/80 bg-zinc-950/[0.03] dark:bg-zinc-900/40 backdrop-blur-xl p-4 sm:p-6 shadow-2xl shadow-indigo-500/10 overflow-hidden"
+        className="relative rounded-3xl border border-zinc-200/80 dark:border-zinc-800/80 bg-zinc-950/[0.03] dark:bg-zinc-900/40 backdrop-blur-md p-4 sm:p-6 shadow-xl overflow-hidden"
       >
         {/* Subtle Background Radial Grid & Ambient Aura */}
-        <div className="absolute inset-0 bg-[radial-gradient(#6366f1_1px,transparent_1px)] [background-size:24px_24px] opacity-15 dark:opacity-25 pointer-events-none" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-72 h-72 bg-indigo-500/10 blur-[90px] rounded-full pointer-events-none" />
+        <div className="absolute inset-0 bg-[radial-gradient(#6366f1_1px,transparent_1px)] [background-size:24px_24px] opacity-10 dark:opacity-20 pointer-events-none" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-indigo-500/10 blur-[60px] rounded-full pointer-events-none" />
 
         {/* Visual Header */}
         <div className="relative z-10 flex items-center justify-between border-b border-zinc-200/60 dark:border-zinc-800/60 pb-3 mb-2">
           <div className="flex items-center gap-2">
-            <Activity className="h-4 w-4 text-indigo-600 dark:text-indigo-400 animate-pulse" />
+            <Activity className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
             <span className="text-xs font-mono font-bold tracking-wider text-zinc-800 dark:text-zinc-200 uppercase">
               Living Architecture
             </span>
           </div>
           <div className="flex items-center gap-1.5 text-[11px] font-mono text-zinc-500 dark:text-zinc-400">
-            <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="h-2 w-2 rounded-full bg-emerald-500" />
             <span>Interactive Node Topology</span>
           </div>
         </div>
@@ -243,15 +244,6 @@ export function LivingArchitecture({ featuredProject }: LivingArchitectureProps)
             className="w-full h-full overflow-visible pointer-events-none"
           >
             <defs>
-              {/* Glowing Gradient Filters for Particles */}
-              <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
-                <feGaussianBlur stdDeviation="2.5" result="blur" />
-                <feMerge>
-                  <feMergeNode in="blur" />
-                  <feMergeNode in="SourceGraphic" />
-                </feMerge>
-              </filter>
-
               <linearGradient id="edgeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
                 <stop offset="0%" stopColor="#6366f1" stopOpacity="0.4" />
                 <stop offset="50%" stopColor="#8b5cf6" stopOpacity="0.6" />
@@ -264,12 +256,12 @@ export function LivingArchitecture({ featuredProject }: LivingArchitectureProps)
               </linearGradient>
             </defs>
 
-            {/* Render Static/Base Conduits */}
+            {/* Render Conduits */}
             {EDGES.map((edge) => {
               const active = isEdgeHighlighted(edge.from, edge.to);
               return (
                 <g key={edge.id}>
-                  {/* Outer glow line */}
+                  {/* Base Line */}
                   <path
                     d={edge.path}
                     fill="none"
@@ -283,9 +275,9 @@ export function LivingArchitecture({ featuredProject }: LivingArchitectureProps)
                     strokeDasharray={active ? 'none' : '4 4'}
                   />
 
-                  {/* Flowing Data Particles */}
-                  {isVisible && (
-                    <circle r={active ? 3.5 : 2.5} fill={active ? '#60a5fa' : '#818cf8'} filter="url(#glow)">
+                  {/* Flowing Data Particles (Only active on desktop) */}
+                  {showActiveAnimations && (
+                    <circle r={active ? 3.5 : 2.5} fill={active ? '#60a5fa' : '#818cf8'}>
                       <animateMotion
                         path={edge.path}
                         dur={`${active ? edge.speed * 0.6 : edge.speed}s`}
@@ -299,13 +291,12 @@ export function LivingArchitecture({ featuredProject }: LivingArchitectureProps)
             })}
           </svg>
 
-          {/* HTML Overlay Nodes for High-Fidelity Interaction */}
+          {/* HTML Overlay Nodes */}
           {NODES.map((node) => {
             const Icon = node.icon;
             const highlighted = isNodeHighlighted(node.id);
             const isSelf = hoveredNode === node.id;
 
-            // Convert viewBox (540x380) to percentage
             const leftPercent = (node.x / 540) * 100;
             const topPercent = (node.y / 380) * 100;
 
@@ -317,25 +308,21 @@ export function LivingArchitecture({ featuredProject }: LivingArchitectureProps)
                   top: `${topPercent}%`,
                   transform: 'translate(-50%, -50%)',
                 }}
-                onMouseEnter={() => setHoveredNode(node.id)}
+                onMouseEnter={() => isDesktop && setHoveredNode(node.id)}
                 className="absolute z-20 cursor-pointer"
               >
-                <motion.div
-                  initial={{ scale: 0, opacity: 0 }}
-                  animate={{
-                    scale: isSelf ? 1.15 : highlighted ? 1 : 0.85,
-                    opacity: highlighted ? 1 : 0.4,
-                  }}
-                  transition={{ duration: 0.3 }}
-                  className={`group relative flex items-center gap-2 px-2.5 sm:px-3 py-1.5 rounded-xl border backdrop-blur-md transition-all duration-200 ${
+                <div
+                  className={`group relative flex items-center gap-2 px-2.5 sm:px-3 py-1.5 rounded-xl border backdrop-blur-sm transition-all duration-200 ${
                     isSelf
                       ? 'bg-zinc-900 text-white shadow-xl shadow-indigo-500/25 ring-2 ring-indigo-500/60 border-indigo-400'
-                      : 'bg-white/90 dark:bg-zinc-900/90 text-zinc-800 dark:text-zinc-200 border-zinc-200/90 dark:border-zinc-800/90 shadow-md hover:border-zinc-400 dark:hover:border-zinc-600'
+                      : highlighted
+                      ? 'bg-white/90 dark:bg-zinc-900/90 text-zinc-800 dark:text-zinc-200 border-zinc-200/90 dark:border-zinc-800/90 shadow-md'
+                      : 'opacity-50 bg-white/60 dark:bg-zinc-900/60 text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-zinc-800'
                   }`}
                 >
-                  {/* Node Icon with custom category color */}
+                  {/* Node Icon */}
                   <div
-                    className="p-1 rounded-lg flex items-center justify-center transition-transform group-hover:scale-110"
+                    className="p-1 rounded-lg flex items-center justify-center"
                     style={{
                       backgroundColor: `${node.color}15`,
                       color: node.color,
@@ -354,12 +341,12 @@ export function LivingArchitecture({ featuredProject }: LivingArchitectureProps)
                     </div>
                   </div>
 
-                  {/* Active Indicator Dot */}
+                  {/* Dot */}
                   <span
                     className="h-1.5 w-1.5 rounded-full shrink-0"
                     style={{ backgroundColor: node.color }}
                   />
-                </motion.div>
+                </div>
               </div>
             );
           })}
