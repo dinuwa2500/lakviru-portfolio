@@ -69,10 +69,10 @@ export function ContactForm({ profile }: ContactFormProps) {
                     Email Address
                   </div>
                   <a
-                    href={`mailto:dinuwaperera123@gmail.com`}
+                    href={`mailto:${profile.email}`}
                     className='font-semibold text-zinc-900 dark:text-zinc-100 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors'
                   >
-                    dinuwaperera123@gmail.com
+                    {profile.email}
                   </a>
                 </div>
               </div>
@@ -105,7 +105,7 @@ export function ContactForm({ profile }: ContactFormProps) {
                     rel='noopener noreferrer'
                     className='font-semibold text-zinc-900 dark:text-zinc-100 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors'
                   >
-                    Lakviru Perera
+                    {profile.name}
                   </a>
                 </div>
               </div>
@@ -124,7 +124,7 @@ export function ContactForm({ profile }: ContactFormProps) {
                     rel='noopener noreferrer'
                     className='font-semibold text-zinc-900 dark:text-zinc-100 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors'
                   >
-                    @dinuwa2500
+                    @{profile.githubUrl.split('/').filter(Boolean).pop() || 'GitHub'}
                   </a>
                 </div>
               </div>

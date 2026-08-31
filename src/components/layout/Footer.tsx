@@ -16,11 +16,11 @@ interface FooterProps {
 }
 
 export function Footer({
-  githubUrl = 'https://github.com/dinuwa2500',
-  linkedinUrl = 'https://www.linkedin.com/in/lakviru-perera-006050371/',
-  email = 'dinuwaperera123@gmail.com',
-  name = 'Lakviru Perera',
-  title = 'Software Engineer',
+  githubUrl,
+  linkedinUrl,
+  email,
+  name,
+  title,
 }: FooterProps) {
   const currentYear = new Date().getFullYear();
 

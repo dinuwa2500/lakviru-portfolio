@@ -28,7 +28,11 @@ export async function getTargetGitHubUsername(): Promise<string> {
   if (settingUsername && settingUsername.trim() !== '') {
     return settingUsername.trim();
   }
-  return (process.env.GITHUB_USERNAME || 'dinuwa2500').trim();
+  const envUsername = process.env.GITHUB_USERNAME;
+  if (envUsername && envUsername.trim() !== '') {
+    return envUsername.trim();
+  }
+  return '';
 }
 
 export async function fetchGitHubUserStats(username?: string): Promise<GitHubContributionStats> {

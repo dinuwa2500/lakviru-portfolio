@@ -1,11 +1,13 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { jwtVerify } from 'jose';
 
-const JWT_SECRET = new TextEncoder().encode(
-  process.env.AUTH_SECRET || 'antigravity-portfolio-cms-super-secret-key-32-chars-minimum'
-);
-
 const COOKIE_NAME = 'auth_session';
+
+function getJwtSecret(): Uint8Array | null {
+  const secret = process.env.AUTH_SECRET;
+  if (!secret || secret.trim() === '') return null;
+  return new TextEncoder().encode(secret.trim());
+}
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -14,11 +16,12 @@ export async function middleware(request: NextRequest) {
   if (pathname.startsWith('/admin')) {
     const isLoginPage = pathname === '/admin/login';
     const token = request.cookies.get(COOKIE_NAME)?.value;
+    const secret = getJwtSecret();
 
     let isValid = false;
-    if (token) {
+    if (token && secret) {
       try {
-        const { payload } = await jwtVerify(token, JWT_SECRET);
+        const { payload } = await jwtVerify(token, secret);
         if (payload && payload.role === 'ADMIN') {
           isValid = true;
         }
