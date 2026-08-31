@@ -16,9 +16,9 @@ interface NavbarProps {
 }
 
 export function Navbar({
-  githubUrl = "https://github.com/dinuwa2500",
-  linkedinUrl = "https://www.linkedin.com/in/lakviru-perera-006050371/",
-  resumeUrl = "/resume.pdf",
+  githubUrl,
+  linkedinUrl,
+  resumeUrl = '/resume.pdf',
 }: NavbarProps) {
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);

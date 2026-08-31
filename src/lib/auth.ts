@@ -2,10 +2,7 @@ import { SignJWT, jwtVerify } from 'jose';
 import bcrypt from 'bcryptjs';
 import { cookies } from 'next/headers';
 import { prisma, isDbConnected } from './db';
-
-const JWT_SECRET = new TextEncoder().encode(
-  process.env.AUTH_SECRET || 'antigravity-portfolio-cms-super-secret-key-32-chars-minimum'
-);
+import { getJwtSecret } from './env';
 
 const COOKIE_NAME = 'auth_session';
 
@@ -25,16 +22,18 @@ export async function comparePassword(plain: string, hashed: string): Promise<bo
 }
 
 export async function createSessionToken(payload: AuthSessionPayload): Promise<string> {
+  const secret = getJwtSecret();
   return new SignJWT({ ...payload })
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
     .setExpirationTime('7d')
-    .sign(JWT_SECRET);
+    .sign(secret);
 }
 
 export async function verifySessionToken(token: string): Promise<AuthSessionPayload | null> {
   try {
-    const { payload } = await jwtVerify(token, JWT_SECRET);
+    const secret = getJwtSecret();
+    const { payload } = await jwtVerify(token, secret);
     return {
       email: payload.email as string,
       role: payload.role as string,
@@ -72,31 +71,30 @@ export async function clearSessionCookie(): Promise<void> {
   cookieStore.delete(COOKIE_NAME);
 }
 
-export async function authenticateAdmin(email: string, password: string):Promise<{ success: boolean; error?: string; user?: AuthSessionPayload }> {
-  const defaultEmails = [
-    (process.env.DEFAULT_ADMIN_EMAIL || '').toLowerCase(),
-    'dinuwaperera123@gmail.com',
-    'admin@lakviru.dev',
-  ].filter(Boolean);
-  const defaultAdminPassword = process.env.DEFAULT_ADMIN_PASSWORD || 'Admin@2026!';
+export async function authenticateAdmin(
+  email: string,
+  password: string
+): Promise<{ success: boolean; error?: string; user?: AuthSessionPayload }> {
+  const envEmail = process.env.DEFAULT_ADMIN_EMAIL?.trim().toLowerCase();
+  const envPassword = process.env.DEFAULT_ADMIN_PASSWORD;
 
-  // Check fallback default credentials
-  if (defaultEmails.includes(email.toLowerCase()) && password === defaultAdminPassword) {
+  // Check environment-configured admin credentials
+  if (envEmail && envPassword && email.trim().toLowerCase() === envEmail && password === envPassword) {
     return {
       success: true,
       user: {
-        email: email.toLowerCase(),
-        name: 'Lakviru Perera',
+        email: envEmail,
+        name: 'Admin',
         role: 'ADMIN',
       },
     };
   }
 
-  // Check database admin if connected
+  // Check database admin credentials if connected
   try {
     if (await isDbConnected()) {
       const user = await prisma.adminUser.findUnique({
-        where: { email: email.toLowerCase() },
+        where: { email: email.trim().toLowerCase() },
       });
 
       if (user && (await comparePassword(password, user.passwordHash))) {
@@ -111,7 +109,7 @@ export async function authenticateAdmin(email: string, password: string):Promise
       }
     }
   } catch (err) {
-    console.error('Error during DB authentication:', err);
+    console.error('Error during DB authentication verification');
   }
 
   return { success: false, error: 'Invalid email or password' };
