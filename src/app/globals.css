@@ -75,6 +75,20 @@ body {
   background: rgba(161, 161, 170, 0.4);
 }
 
+/* Hide default cursor on desktop pointer devices so the custom round motion icon is active */
+@media (pointer: fine) {
+  body,
+  a,
+  button,
+  input,
+  select,
+  textarea,
+  [role="button"],
+  label {
+    cursor: none !important;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto !important;
