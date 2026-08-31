@@ -56,7 +56,7 @@ export function HeroEngineeringVisual({ project }: HeroEngineeringVisualProps) {
                 Featured Work
               </span>
               <span className="text-zinc-300 dark:text-zinc-700">•</span>
-              <Badge variant="indigo" size="sm">
+              <Badge variant="primary" size="sm">
                 {project.category}
               </Badge>
             </div>
