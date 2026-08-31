@@ -106,17 +106,21 @@ let isSeededChecked = false;
 async function ensureDatabaseSeeded(): Promise<void> {
   if (isSeededChecked || !prisma) return;
   try {
+    isSeededChecked = true;
     const count = await prisma.project.count();
     if (count === 0) {
-      // Auto-populate initial verified data into new database tables
-      const profileCount = await prisma.profile.count();
-      if (profileCount === 0) {
-        await prisma.profile.create({ data: { ...INITIAL_PROFILE } });
-      }
+      // Auto-populate initial verified data into new database tables with upsert
+      await prisma.profile.upsert({
+        where: { id: INITIAL_PROFILE.id },
+        update: {},
+        create: { ...INITIAL_PROFILE },
+      });
 
       for (const p of INITIAL_PROJECTS) {
-        await prisma.project.create({
-          data: {
+        await prisma.project.upsert({
+          where: { slug: p.slug },
+          update: {},
+          create: {
             slug: p.slug,
             githubRepoId: p.githubRepoId,
             githubName: p.githubName,
@@ -149,8 +153,11 @@ async function ensureDatabaseSeeded(): Promise<void> {
       }
 
       for (const s of INITIAL_SKILLS) {
-        await prisma.skill.create({
-          data: {
+        await prisma.skill.upsert({
+          where: { id: s.id },
+          update: {},
+          create: {
+            id: s.id,
             name: s.name,
             category: s.category,
             skillLevel: s.skillLevel,
@@ -163,8 +170,11 @@ async function ensureDatabaseSeeded(): Promise<void> {
       }
 
       for (const e of INITIAL_EXPERIENCES) {
-        await prisma.experience.create({
-          data: {
+        await prisma.experience.upsert({
+          where: { id: e.id },
+          update: {},
+          create: {
+            id: e.id,
             company: e.company,
             position: e.position,
             location: e.location,
@@ -181,8 +191,11 @@ async function ensureDatabaseSeeded(): Promise<void> {
       }
 
       for (const edu of INITIAL_EDUCATIONS) {
-        await prisma.education.create({
-          data: {
+        await prisma.education.upsert({
+          where: { id: edu.id },
+          update: {},
+          create: {
+            id: edu.id,
             institution: edu.institution,
             degree: edu.degree,
             field: edu.field,
@@ -197,7 +210,6 @@ async function ensureDatabaseSeeded(): Promise<void> {
         });
       }
     }
-    isSeededChecked = true;
   } catch {
     // Non-blocking fallback
   }
