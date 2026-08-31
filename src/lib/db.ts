@@ -791,6 +791,36 @@ export const dbService = {
     return newMsg;
   },
 
+  async markMessageRead(id: string): Promise<boolean> {
+    try {
+      if (await isDbConnected()) {
+        await prisma.contactMessage.update({
+          where: { id },
+          data: { isRead: true },
+        });
+        return true;
+      }
+    } catch (e) {
+      console.warn('Fallback to memory store for mark message read:', e);
+    }
+    const msg = memoryStore.messages.find((m) => m.id === id);
+    if (msg) msg.isRead = true;
+    return true;
+  },
+
+  async deleteMessage(id: string): Promise<boolean> {
+    try {
+      if (await isDbConnected()) {
+        await prisma.contactMessage.delete({ where: { id } });
+        return true;
+      }
+    } catch (e) {
+      console.warn('Fallback to memory store for delete message:', e);
+    }
+    memoryStore.messages = memoryStore.messages.filter((m) => m.id !== id);
+    return true;
+  },
+
   // SYNC LOGS
   async getSyncLogs(limit = 10): Promise<SyncLogData[]> {
     try {

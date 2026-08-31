@@ -1,6 +1,7 @@
 'use server';
 
 import { dbService } from '@/lib/db';
+import { sendEmailNotification } from '@/lib/email';
 import { contactSchema } from '@/lib/validations';
 import { headers } from 'next/headers';
 
@@ -63,6 +64,14 @@ export async function submitContactFormAction(prevState: any, formData: FormData
       ipHash: ip.slice(0, 15),
     });
 
+    // Send immediate email notification to your Gmail via HTTP REST API (non-blocking)
+    sendEmailNotification({
+      name: rawData.name,
+      email: rawData.email,
+      subject: rawData.subject,
+      message: rawData.message,
+    }).catch((err) => console.warn('Email notification error:', err));
+
     return {
       success: true,
       message: "Thank you for reaching out! I'll get back to you promptly.",
@@ -72,5 +81,23 @@ export async function submitContactFormAction(prevState: any, formData: FormData
       success: false,
       error: 'An unexpected error occurred while sending your message. Please try again or email directly.',
     };
+  }
+}
+
+export async function markMessageReadAction(id: string) {
+  try {
+    await dbService.markMessageRead(id);
+    return { success: true };
+  } catch (err: any) {
+    return { success: false, error: err?.message || 'Failed to update message' };
+  }
+}
+
+export async function deleteMessageAction(id: string) {
+  try {
+    await dbService.deleteMessage(id);
+    return { success: true };
+  } catch (err: any) {
+    return { success: false, error: err?.message || 'Failed to delete message' };
   }
 }
