@@ -21,7 +21,7 @@ export default function AdminLoginPage() {
   }, [state, router]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 sm:p-6 bg-zinc-950 text-zinc-100 relative overflow-hidden">
+    <div className="admin-page min-h-screen flex items-center justify-center p-4 sm:p-6 bg-zinc-950 text-zinc-100 relative overflow-hidden">
       {/* Background glow effects */}
       <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[300px] bg-indigo-600/15 blur-[120px] pointer-events-none rounded-full" />
 
@@ -65,8 +65,7 @@ export default function AdminLoginPage() {
               label="Admin Email"
               name="email"
               type="email"
-              defaultValue="admin@lakviru.dev"
-              placeholder="admin@lakviru.dev"
+              placeholder="admin@yourdomain.com"
               required
             />
 
@@ -74,7 +73,6 @@ export default function AdminLoginPage() {
               label="Password"
               name="password"
               type="password"
-              defaultValue="Admin@2026!"
               placeholder="••••••••"
               required
             />
@@ -92,16 +90,6 @@ export default function AdminLoginPage() {
               </Button>
             </div>
           </form>
-
-          {/* Initial Setup Helper Box */}
-          <div className="p-3.5 rounded-xl bg-zinc-950/60 border border-zinc-800 text-[11px] text-zinc-400 space-y-1 font-mono">
-            <div className="text-zinc-300 font-semibold flex items-center gap-1.5">
-              <Sparkles className="h-3 w-3 text-indigo-400" />
-              <span>Default Credentials:</span>
-            </div>
-            <div className="text-zinc-400">Email: <span className="text-zinc-200">admin@lakviru.dev</span></div>
-            <div className="text-zinc-400">Pass: <span className="text-zinc-200">Admin@2026!</span></div>
-          </div>
         </div>
       </div>
     </div>

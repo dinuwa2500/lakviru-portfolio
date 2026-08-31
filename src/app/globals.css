@@ -75,17 +75,33 @@ body {
   background: rgba(161, 161, 170, 0.4);
 }
 
-/* Hide default cursor on desktop pointer devices so the custom round motion icon is active */
+/* Hide default cursor on desktop pointer devices on public pages so custom motion icon is active */
 @media (pointer: fine) {
-  body,
-  a,
-  button,
-  input,
-  select,
-  textarea,
-  [role="button"],
-  label {
+  body:not(.admin-page),
+  body:not(.admin-page) a:not(.admin-page *),
+  body:not(.admin-page) button:not(.admin-page *),
+  body:not(.admin-page) input:not(.admin-page *),
+  body:not(.admin-page) select:not(.admin-page *),
+  body:not(.admin-page) textarea:not(.admin-page *),
+  body:not(.admin-page) [role="button"]:not(.admin-page *),
+  body:not(.admin-page) label:not(.admin-page *) {
     cursor: none !important;
+  }
+
+  /* Explicit normal standard cursor for Admin pages */
+  .admin-page,
+  .admin-page * {
+    cursor: auto !important;
+  }
+  .admin-page a,
+  .admin-page button,
+  .admin-page [role="button"],
+  .admin-page select {
+    cursor: pointer !important;
+  }
+  .admin-page input,
+  .admin-page textarea {
+    cursor: text !important;
   }
 }
 
