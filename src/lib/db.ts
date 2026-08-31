@@ -101,6 +101,108 @@ export async function isDbConnected(): Promise<boolean> {
   }
 }
 
+let isSeededChecked = false;
+
+async function ensureDatabaseSeeded(): Promise<void> {
+  if (isSeededChecked || !prisma) return;
+  try {
+    const count = await prisma.project.count();
+    if (count === 0) {
+      // Auto-populate initial verified data into new database tables
+      const profileCount = await prisma.profile.count();
+      if (profileCount === 0) {
+        await prisma.profile.create({ data: { ...INITIAL_PROFILE } });
+      }
+
+      for (const p of INITIAL_PROJECTS) {
+        await prisma.project.create({
+          data: {
+            slug: p.slug,
+            githubRepoId: p.githubRepoId,
+            githubName: p.githubName,
+            githubFullName: p.githubFullName,
+            githubUrl: p.githubUrl,
+            githubDescription: p.githubDescription,
+            githubStars: p.githubStars,
+            githubForks: p.githubForks,
+            githubLanguage: p.githubLanguage,
+            githubLanguages: JSON.stringify(p.githubLanguages || []),
+            githubTopics: JSON.stringify(p.githubTopics || []),
+            customTitle: p.customTitle,
+            customDescription: p.customDescription,
+            category: p.category,
+            status: p.status,
+            isFeatured: p.isFeatured,
+            isVisible: p.isVisible,
+            displayOrder: p.displayOrder,
+            thumbnail: p.thumbnail,
+            screenshots: JSON.stringify(p.screenshots || []),
+            problem: p.problem,
+            solution: p.solution,
+            myRole: p.myRole,
+            features: JSON.stringify(p.features || []),
+            demoUrl: p.demoUrl,
+            architecture: p.architecture,
+            technologies: JSON.stringify(p.technologies || []),
+          },
+        });
+      }
+
+      for (const s of INITIAL_SKILLS) {
+        await prisma.skill.create({
+          data: {
+            name: s.name,
+            category: s.category,
+            skillLevel: s.skillLevel,
+            icon: s.icon,
+            description: s.description,
+            displayOrder: s.displayOrder,
+            isFeatured: s.isFeatured,
+          },
+        });
+      }
+
+      for (const e of INITIAL_EXPERIENCES) {
+        await prisma.experience.create({
+          data: {
+            company: e.company,
+            position: e.position,
+            location: e.location,
+            startDate: e.startDate,
+            endDate: e.endDate,
+            isCurrent: e.isCurrent,
+            description: e.description,
+            responsibilities: JSON.stringify(e.responsibilities || []),
+            achievements: JSON.stringify(e.achievements || []),
+            technologies: JSON.stringify(e.technologies || []),
+            displayOrder: e.displayOrder,
+          },
+        });
+      }
+
+      for (const edu of INITIAL_EDUCATIONS) {
+        await prisma.education.create({
+          data: {
+            institution: edu.institution,
+            degree: edu.degree,
+            field: edu.field,
+            location: edu.location,
+            startDate: edu.startDate,
+            endDate: edu.endDate,
+            isCurrent: edu.isCurrent,
+            description: edu.description,
+            grade: edu.grade,
+            displayOrder: edu.displayOrder,
+          },
+        });
+      }
+    }
+    isSeededChecked = true;
+  } catch {
+    // Non-blocking fallback
+  }
+}
+
 // Data Access Layer with Automatic DB / Memory Resolution
 
 export const dbService = {
@@ -108,6 +210,7 @@ export const dbService = {
   async getProfile(): Promise<ProfileData> {
     try {
       if (await isDbConnected()) {
+        await ensureDatabaseSeeded();
         const p = await prisma.profile.findFirst();
         if (p) return p as unknown as ProfileData;
       }
