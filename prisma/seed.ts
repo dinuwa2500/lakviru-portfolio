@@ -32,13 +32,24 @@ async function main() {
   console.log('✓ Admin user initialized');
 
   // 2. Seed Profile
-  const existingProfile = await prisma.profile.findFirst();
-  if (!existingProfile) {
-    await prisma.profile.create({
-      data: { ...INITIAL_PROFILE },
-    });
-    console.log('✓ Profile initialized');
-  }
+  await prisma.profile.upsert({
+    where: { id: INITIAL_PROFILE.id },
+    update: {
+      name: INITIAL_PROFILE.name,
+      primaryTitle: INITIAL_PROFILE.primaryTitle,
+      heroSubtitle: INITIAL_PROFILE.heroSubtitle,
+      bio: INITIAL_PROFILE.bio,
+      location: INITIAL_PROFILE.location,
+      email: INITIAL_PROFILE.email,
+      githubUrl: INITIAL_PROFILE.githubUrl,
+      linkedinUrl: INITIAL_PROFILE.linkedinUrl,
+      resumeUrl: INITIAL_PROFILE.resumeUrl,
+      avatarUrl: INITIAL_PROFILE.avatarUrl,
+      isAvailableForWork: INITIAL_PROFILE.isAvailableForWork,
+    },
+    create: { ...INITIAL_PROFILE },
+  });
+  console.log('✓ Profile initialized');
 
   // 3. Seed Projects
   for (const project of INITIAL_PROJECTS) {
@@ -80,71 +91,65 @@ async function main() {
 
   // 4. Seed Skills
   for (const skill of INITIAL_SKILLS) {
-    const existing = await prisma.skill.findFirst({
-      where: { name: skill.name, category: skill.category },
+    await prisma.skill.upsert({
+      where: { id: skill.id },
+      update: {},
+      create: {
+        id: skill.id,
+        name: skill.name,
+        category: skill.category,
+        skillLevel: skill.skillLevel,
+        icon: skill.icon,
+        description: skill.description,
+        displayOrder: skill.displayOrder,
+        isFeatured: skill.isFeatured,
+      },
     });
-    if (!existing) {
-      await prisma.skill.create({
-        data: {
-          name: skill.name,
-          category: skill.category,
-          skillLevel: skill.skillLevel,
-          icon: skill.icon,
-          description: skill.description,
-          displayOrder: skill.displayOrder,
-          isFeatured: skill.isFeatured,
-        },
-      });
-    }
   }
   console.log(`✓ ${INITIAL_SKILLS.length} Skills initialized`);
 
   // 5. Seed Experience (VVH Solutions)
   for (const exp of INITIAL_EXPERIENCES) {
-    const existing = await prisma.experience.findFirst({
-      where: { company: exp.company, position: exp.position },
+    await prisma.experience.upsert({
+      where: { id: exp.id },
+      update: {},
+      create: {
+        id: exp.id,
+        company: exp.company,
+        position: exp.position,
+        location: exp.location,
+        startDate: exp.startDate,
+        endDate: exp.endDate,
+        isCurrent: exp.isCurrent,
+        description: exp.description,
+        responsibilities: JSON.stringify(exp.responsibilities || []),
+        achievements: JSON.stringify(exp.achievements || []),
+        technologies: JSON.stringify(exp.technologies || []),
+        displayOrder: exp.displayOrder,
+      },
     });
-    if (!existing) {
-      await prisma.experience.create({
-        data: {
-          company: exp.company,
-          position: exp.position,
-          location: exp.location,
-          startDate: exp.startDate,
-          endDate: exp.endDate,
-          isCurrent: exp.isCurrent,
-          description: exp.description,
-          responsibilities: JSON.stringify(exp.responsibilities || []),
-          achievements: JSON.stringify(exp.achievements || []),
-          technologies: JSON.stringify(exp.technologies || []),
-          displayOrder: exp.displayOrder,
-        },
-      });
-    }
   }
   console.log(`✓ Experience initialized`);
 
   // 6. Seed Education (SLIIT)
   for (const edu of INITIAL_EDUCATIONS) {
-    const existing = await prisma.education.findFirst({
-      where: { institution: edu.institution, degree: edu.degree },
+    await prisma.education.upsert({
+      where: { id: edu.id },
+      update: {},
+      create: {
+        id: edu.id,
+        institution: edu.institution,
+        degree: edu.degree,
+        field: edu.field,
+        location: edu.location,
+        startDate: edu.startDate,
+        endDate: edu.endDate,
+        isCurrent: edu.isCurrent,
+        description: edu.description,
+        grade: edu.grade,
+        displayOrder: edu.displayOrder,
+      },
     });
-    if (!existing) {
-      await prisma.education.create({
-        data: {
-          institution: edu.institution,
-          degree: edu.degree,
-          field: edu.field,
-          location: edu.location,
-          startDate: edu.startDate,
-          endDate: edu.endDate,
-          isCurrent: edu.isCurrent,
-          description: edu.description,
-          grade: edu.grade,
-          displayOrder: edu.displayOrder,
-        },
-      });
-    }
   }
   console.log(`✓ Education initialized`);
 

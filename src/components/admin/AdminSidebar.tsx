@@ -13,6 +13,7 @@ import {
   Settings,
   ExternalLink,
   LogOut,
+  Mail,
   Terminal,
 } from 'lucide-react';
 import { logoutAction } from '@/actions/auth';
@@ -23,6 +24,7 @@ export function AdminSidebar() {
 
   const navItems = [
     { name: 'Dashboard', href: '/admin/dashboard', icon: LayoutDashboard },
+    { name: 'Inbox & Messages', href: '/admin/messages', icon: Mail },
     { name: 'Projects', href: '/admin/projects', icon: FolderGit2 },
     { name: 'Skills & Tech', href: '/admin/skills', icon: Cpu },
     { name: 'Experience', href: '/admin/experience', icon: Briefcase },
