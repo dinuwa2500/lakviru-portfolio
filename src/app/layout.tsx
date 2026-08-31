@@ -6,11 +6,13 @@ import { ThemeProvider } from '@/components/theme-provider';
 const inter = Inter({
   subsets: ['latin'],
   variable: '--font-sans',
+  display: 'swap',
 });
 
 const jetbrainsMono = JetBrains_Mono({
   subsets: ['latin'],
   variable: '--font-mono',
+  display: 'swap',
 });
 
 export const viewport: Viewport = {

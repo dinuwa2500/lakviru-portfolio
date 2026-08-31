@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { Star, GitFork, ExternalLink, ArrowUpRight, Sparkles, ArrowRight } from 'lucide-react';
 import { Github } from '@/components/ui/Icons';
@@ -15,7 +16,7 @@ interface ProjectCardProps {
   isPriority?: boolean;
 }
 
-export function ProjectCard({ project }: ProjectCardProps) {
+export function ProjectCard({ project, isPriority = false }: ProjectCardProps) {
   const displayTitle = project.customTitle || project.githubName || 'Project';
   const displayDesc = project.customDescription || project.githubDescription || 'Software engineering project.';
   const primaryLang = project.githubLanguage || (project.technologies && project.technologies[0]) || 'Code';
@@ -30,10 +31,13 @@ export function ProjectCard({ project }: ProjectCardProps) {
       {/* Thumbnail Area with Zoom and Interactive Overlay */}
       <div className="relative h-48 sm:h-52 w-full overflow-hidden bg-zinc-950/80 border-b border-zinc-200/60 dark:border-zinc-800/60">
         {project.thumbnail ? (
-          <img
+          <Image
             src={project.thumbnail}
             alt={displayTitle}
-            className="h-full w-full object-cover object-center group-hover:scale-105 transition-transform duration-500 ease-out"
+            fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            priority={isPriority}
+            className="object-cover object-center group-hover:scale-105 transition-transform duration-500 ease-out"
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-zinc-900 via-indigo-950/30 to-zinc-900 text-zinc-600 dark:text-zinc-400 font-mono text-sm">

@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
+import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import {
   ArrowLeft,
@@ -51,7 +52,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export const revalidate = 60;
+export const revalidate = 3600; // Cache for 1 hour, invalidated automatically upon admin edit
 
 export default async function ProjectDetailPage({ params }: Props) {
   const { slug } = await params;
@@ -129,11 +130,14 @@ export default async function ProjectDetailPage({ params }: Props) {
       {/* Hero Image / Banner */}
       {project.thumbnail && (
         <FadeIn direction="up" delay={0.1}>
-          <div className="rounded-2xl overflow-hidden border border-zinc-200/80 dark:border-zinc-800/80 shadow-2xl bg-zinc-950">
-            <img
+          <div className="relative h-[260px] sm:h-[420px] w-full rounded-2xl overflow-hidden border border-zinc-200/80 dark:border-zinc-800/80 shadow-2xl bg-zinc-950">
+            <Image
               src={project.thumbnail}
               alt={title}
-              className="w-full max-h-[460px] object-cover object-center"
+              fill
+              priority
+              sizes="(max-width: 1024px) 100vw, 1024px"
+              className="object-cover object-center"
             />
           </div>
         </FadeIn>
@@ -287,12 +291,15 @@ export default async function ProjectDetailPage({ params }: Props) {
             {project.screenshots.map((shot, idx) => (
               <div
                 key={idx}
-                className="rounded-2xl overflow-hidden border border-zinc-200/80 dark:border-zinc-800/80 shadow-md bg-zinc-950"
+                className="relative h-56 w-full rounded-2xl overflow-hidden border border-zinc-200/80 dark:border-zinc-800/80 shadow-md bg-zinc-950"
               >
-                <img
+                <Image
                   src={shot}
                   alt={`${title} Preview ${idx + 1}`}
-                  className="w-full h-56 object-cover object-center hover:scale-105 transition-transform duration-300"
+                  fill
+                  loading="lazy"
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                  className="object-cover object-center hover:scale-105 transition-transform duration-300"
                 />
               </div>
             ))}
