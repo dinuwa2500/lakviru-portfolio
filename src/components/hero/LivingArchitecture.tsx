@@ -161,16 +161,27 @@ export function LivingArchitecture({ featuredProject }: LivingArchitectureProps)
     return () => observer.disconnect();
   }, []);
 
+  const rafId = React.useRef<number | null>(null);
+
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!containerRef.current) return;
+    if (rafId.current !== null) {
+      cancelAnimationFrame(rafId.current);
+    }
     const rect = containerRef.current.getBoundingClientRect();
     const x = (e.clientX - rect.left) / rect.width - 0.5;
     const y = (e.clientY - rect.top) / rect.height - 0.5;
-    mouseX.set(x);
-    mouseY.set(y);
+
+    rafId.current = requestAnimationFrame(() => {
+      mouseX.set(x);
+      mouseY.set(y);
+    });
   };
 
   const handleMouseLeave = () => {
+    if (rafId.current !== null) {
+      cancelAnimationFrame(rafId.current);
+    }
     mouseX.set(0);
     mouseY.set(0);
     setHoveredNode(null);

@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
+import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import {
   ArrowLeft,
@@ -7,7 +8,6 @@ import {
   Star,
   GitFork,
   Calendar,
-  Layers,
   Cpu,
   CheckCircle,
   HelpCircle,
@@ -19,6 +19,7 @@ import {
 import { Github } from '@/components/ui/Icons';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
+import { FadeIn } from '@/components/motion/FadeIn';
 import { dbService } from '@/lib/db';
 import { formatDate, getLanguageColor } from '@/lib/utils';
 
@@ -51,7 +52,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export const revalidate = 60;
+export const revalidate = 3600; // Cache for 1 hour, invalidated automatically upon admin edit
 
 export default async function ProjectDetailPage({ params }: Props) {
   const { slug } = await params;
@@ -69,7 +70,7 @@ export default async function ProjectDetailPage({ params }: Props) {
   return (
     <article className="pt-28 sm:pt-36 pb-24 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
       {/* Back Link */}
-      <div>
+      <FadeIn direction="left">
         <Link
           href="/projects"
           className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-medium text-zinc-600 dark:text-zinc-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
@@ -77,10 +78,10 @@ export default async function ProjectDetailPage({ params }: Props) {
           <ArrowLeft className="h-4 w-4" />
           <span>Back to Projects</span>
         </Link>
-      </div>
+      </FadeIn>
 
       {/* Hero Header */}
-      <div className="space-y-6">
+      <FadeIn direction="up" delay={0.05} className="space-y-6">
         <div className="flex flex-wrap items-center gap-2.5">
           <Badge variant="primary" className="font-mono text-xs">
             {project.category}
@@ -124,57 +125,64 @@ export default async function ProjectDetailPage({ params }: Props) {
             </a>
           )}
         </div>
-      </div>
+      </FadeIn>
 
       {/* Hero Image / Banner */}
       {project.thumbnail && (
-        <div className="rounded-2xl overflow-hidden border border-zinc-200/80 dark:border-zinc-800/80 shadow-2xl bg-zinc-950">
-          <img
-            src={project.thumbnail}
-            alt={title}
-            className="w-full max-h-[460px] object-cover object-center"
-          />
-        </div>
+        <FadeIn direction="up" delay={0.1}>
+          <div className="relative h-[260px] sm:h-[420px] w-full rounded-2xl overflow-hidden border border-zinc-200/80 dark:border-zinc-800/80 shadow-2xl bg-zinc-950">
+            <Image
+              src={project.thumbnail}
+              alt={title}
+              fill
+              priority
+              sizes="(max-width: 1024px) 100vw, 1024px"
+              className="object-cover object-center"
+            />
+          </div>
+        </FadeIn>
       )}
 
       {/* GitHub Repository Metrics Box */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 p-5 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 bg-white/60 dark:bg-zinc-900/60 backdrop-blur-md">
-        <div className="space-y-1">
-          <div className="text-xs text-zinc-500 font-mono">Primary Language</div>
-          <div className="flex items-center gap-2 font-semibold text-sm text-zinc-900 dark:text-zinc-100">
-            <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: langColor }} />
-            <span>{primaryLang}</span>
+      <FadeIn direction="up" delay={0.12}>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 p-5 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 bg-white/70 dark:bg-zinc-900/70 backdrop-blur-md shadow-md">
+          <div className="space-y-1">
+            <div className="text-xs text-zinc-500 font-mono">Primary Language</div>
+            <div className="flex items-center gap-2 font-semibold text-sm text-zinc-900 dark:text-zinc-100">
+              <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: langColor }} />
+              <span>{primaryLang}</span>
+            </div>
           </div>
-        </div>
 
-        <div className="space-y-1">
-          <div className="text-xs text-zinc-500 font-mono">GitHub Stars</div>
-          <div className="flex items-center gap-1.5 font-semibold text-sm text-zinc-900 dark:text-zinc-100">
-            <Star className="h-4 w-4 text-amber-500 fill-amber-500/30" />
-            <span>{project.githubStars}</span>
+          <div className="space-y-1">
+            <div className="text-xs text-zinc-500 font-mono">GitHub Stars</div>
+            <div className="flex items-center gap-1.5 font-semibold text-sm text-zinc-900 dark:text-zinc-100">
+              <Star className="h-4 w-4 text-amber-500 fill-amber-500/30" />
+              <span>{project.githubStars}</span>
+            </div>
           </div>
-        </div>
 
-        <div className="space-y-1">
-          <div className="text-xs text-zinc-500 font-mono">GitHub Forks</div>
-          <div className="flex items-center gap-1.5 font-semibold text-sm text-zinc-900 dark:text-zinc-100">
-            <GitFork className="h-4 w-4 text-purple-500" />
-            <span>{project.githubForks}</span>
+          <div className="space-y-1">
+            <div className="text-xs text-zinc-500 font-mono">GitHub Forks</div>
+            <div className="flex items-center gap-1.5 font-semibold text-sm text-zinc-900 dark:text-zinc-100">
+              <GitFork className="h-4 w-4 text-purple-500" />
+              <span>{project.githubForks}</span>
+            </div>
           </div>
-        </div>
 
-        <div className="space-y-1">
-          <div className="text-xs text-zinc-500 font-mono">Created</div>
-          <div className="flex items-center gap-1.5 font-semibold text-sm text-zinc-900 dark:text-zinc-100">
-            <Calendar className="h-4 w-4 text-zinc-400" />
-            <span>{formatDate(project.githubCreatedAt || project.createdAt)}</span>
+          <div className="space-y-1">
+            <div className="text-xs text-zinc-500 font-mono">Created</div>
+            <div className="flex items-center gap-1.5 font-semibold text-sm text-zinc-900 dark:text-zinc-100">
+              <Calendar className="h-4 w-4 text-zinc-400" />
+              <span>{formatDate(project.githubCreatedAt || project.createdAt)}</span>
+            </div>
           </div>
         </div>
-      </div>
+      </FadeIn>
 
       {/* Tech Stack Pills */}
       {project.technologies && project.technologies.length > 0 && (
-        <div className="space-y-3">
+        <FadeIn direction="up" delay={0.14} className="space-y-3">
           <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-zinc-500">
             Technology Stack & Tools
           </h3>
@@ -182,90 +190,100 @@ export default async function ProjectDetailPage({ params }: Props) {
             {project.technologies.map((tech) => (
               <span
                 key={tech}
-                className="px-3 py-1 rounded-lg text-xs font-mono font-semibold bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700/60"
+                className="px-3 py-1 rounded-xl text-xs font-mono font-semibold bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700/60"
               >
                 {tech}
               </span>
             ))}
           </div>
-        </div>
+        </FadeIn>
       )}
 
       {/* Problem & Solution Case Study Section */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
         {project.problem && (
-          <div className="rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 bg-white/60 dark:bg-zinc-900/60 backdrop-blur-md p-6 sm:p-8 space-y-3">
-            <div className="flex items-center gap-2 text-rose-600 dark:text-rose-400 font-bold text-sm font-mono">
-              <HelpCircle className="h-4 w-4" />
-              <span>The Engineering Problem</span>
+          <FadeIn direction="up" delay={0.16}>
+            <div className="rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 bg-white/70 dark:bg-zinc-900/70 backdrop-blur-md p-6 sm:p-8 space-y-3 shadow-md h-full">
+              <div className="flex items-center gap-2 text-rose-600 dark:text-rose-400 font-bold text-sm font-mono">
+                <HelpCircle className="h-4 w-4" />
+                <span>The Engineering Problem</span>
+              </div>
+              <p className="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">
+                {project.problem}
+              </p>
             </div>
-            <p className="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">
-              {project.problem}
-            </p>
-          </div>
+          </FadeIn>
         )}
 
         {project.solution && (
-          <div className="rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 bg-white/60 dark:bg-zinc-900/60 backdrop-blur-md p-6 sm:p-8 space-y-3">
-            <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 font-bold text-sm font-mono">
-              <Lightbulb className="h-4 w-4" />
-              <span>The Architecture & Solution</span>
+          <FadeIn direction="up" delay={0.18}>
+            <div className="rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 bg-white/70 dark:bg-zinc-900/70 backdrop-blur-md p-6 sm:p-8 space-y-3 shadow-md h-full">
+              <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 font-bold text-sm font-mono">
+                <Lightbulb className="h-4 w-4" />
+                <span>The Architecture & Solution</span>
+              </div>
+              <p className="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">
+                {project.solution}
+              </p>
             </div>
-            <p className="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">
-              {project.solution}
-            </p>
-          </div>
+          </FadeIn>
         )}
       </div>
 
       {/* Key Architectural Features */}
       {project.features && project.features.length > 0 && (
-        <div className="rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 bg-white/60 dark:bg-zinc-900/60 backdrop-blur-md p-6 sm:p-8 space-y-4">
-          <div className="flex items-center gap-2 font-bold text-base text-zinc-900 dark:text-zinc-100">
-            <Workflow className="h-5 w-5 text-indigo-500" />
-            <span>Key Engineering Highlights & Capabilities</span>
-          </div>
+        <FadeIn direction="up" delay={0.2}>
+          <div className="rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 bg-white/70 dark:bg-zinc-900/70 backdrop-blur-md p-6 sm:p-8 space-y-4 shadow-md">
+            <div className="flex items-center gap-2 font-bold text-base text-zinc-900 dark:text-zinc-100">
+              <Workflow className="h-5 w-5 text-indigo-500" />
+              <span>Key Engineering Highlights & Capabilities</span>
+            </div>
 
-          <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
-            {project.features.map((feat, i) => (
-              <li key={i} className="flex items-start gap-3 text-xs sm:text-sm text-zinc-600 dark:text-zinc-400">
-                <CheckCircle className="h-4 w-4 text-indigo-500 shrink-0 mt-0.5" />
-                <span>{feat}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
+            <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+              {project.features.map((feat, i) => (
+                <li key={i} className="flex items-start gap-3 text-xs sm:text-sm text-zinc-600 dark:text-zinc-400">
+                  <CheckCircle className="h-4 w-4 text-indigo-500 shrink-0 mt-0.5" />
+                  <span>{feat}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </FadeIn>
       )}
 
       {/* Architecture Flow */}
       {project.architecture && (
-        <div className="rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 bg-zinc-950 p-6 sm:p-8 space-y-3 font-mono text-xs text-zinc-300">
-          <div className="flex items-center gap-2 text-indigo-400 font-bold text-sm">
-            <Cpu className="h-4 w-4" />
-            <span>Data Flow & Component Architecture</span>
+        <FadeIn direction="up" delay={0.22}>
+          <div className="rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 bg-zinc-950 p-6 sm:p-8 space-y-3 font-mono text-xs text-zinc-300 shadow-xl">
+            <div className="flex items-center gap-2 text-indigo-400 font-bold text-sm">
+              <Cpu className="h-4 w-4" />
+              <span>Data Flow & Component Architecture</span>
+            </div>
+            <div className="p-4 rounded-xl bg-zinc-900/80 border border-zinc-800 overflow-x-auto text-zinc-200">
+              {project.architecture}
+            </div>
           </div>
-          <div className="p-4 rounded-xl bg-zinc-900/80 border border-zinc-800 overflow-x-auto text-zinc-200">
-            {project.architecture}
-          </div>
-        </div>
+        </FadeIn>
       )}
 
       {/* My Contribution / Role */}
       {project.myRole && (
-        <div className="rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 bg-white/60 dark:bg-zinc-900/60 backdrop-blur-md p-6 sm:p-8 space-y-3">
-          <div className="flex items-center gap-2 font-bold text-sm font-mono text-zinc-900 dark:text-zinc-100">
-            <User className="h-4 w-4 text-indigo-500" />
-            <span>My Contribution & Engineering Role</span>
+        <FadeIn direction="up" delay={0.24}>
+          <div className="rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 bg-white/70 dark:bg-zinc-900/70 backdrop-blur-md p-6 sm:p-8 space-y-3 shadow-md">
+            <div className="flex items-center gap-2 font-bold text-sm font-mono text-zinc-900 dark:text-zinc-100">
+              <User className="h-4 w-4 text-indigo-500" />
+              <span>My Contribution & Engineering Role</span>
+            </div>
+            <p className="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">
+              {project.myRole}
+            </p>
           </div>
-          <p className="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">
-            {project.myRole}
-          </p>
-        </div>
+        </FadeIn>
       )}
 
-      {/* Screenshots Gallery if available */}
+      {/* Screenshots Gallery */}
       {project.screenshots && project.screenshots.length > 1 && (
-        <div className="space-y-4 pt-4">
+        <FadeIn direction="up" delay={0.26} className="space-y-4 pt-4">
           <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-100">
             System Gallery & Previews
           </h3>
@@ -273,17 +291,20 @@ export default async function ProjectDetailPage({ params }: Props) {
             {project.screenshots.map((shot, idx) => (
               <div
                 key={idx}
-                className="rounded-xl overflow-hidden border border-zinc-200/80 dark:border-zinc-800/80 shadow-md bg-zinc-950"
+                className="relative h-56 w-full rounded-2xl overflow-hidden border border-zinc-200/80 dark:border-zinc-800/80 shadow-md bg-zinc-950"
               >
-                <img
+                <Image
                   src={shot}
                   alt={`${title} Preview ${idx + 1}`}
-                  className="w-full h-56 object-cover object-center hover:scale-105 transition-transform duration-300"
+                  fill
+                  loading="lazy"
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                  className="object-cover object-center hover:scale-105 transition-transform duration-300"
                 />
               </div>
             ))}
           </div>
-        </div>
+        </FadeIn>
       )}
     </article>
   );

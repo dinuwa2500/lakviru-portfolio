@@ -78,16 +78,25 @@ if (process.env.NODE_ENV !== 'production' && prisma) {
   globalThis.prismaGlobal = prisma;
 }
 
-// Check if PostgreSQL database is reachable
+// Check if PostgreSQL database is reachable with 30s caching to avoid redundant roundtrips
+let dbConnectedCached: boolean | null = null;
+let lastDbCheckTime = 0;
+const DB_CHECK_TTL = 30000;
+
 export async function isDbConnected(): Promise<boolean> {
   if (!prisma) return false;
-  if (!process.env.DATABASE_URL || process.env.DATABASE_URL.includes('localhost:5432/portfolio_db')) {
-    // If using default local placeholder and not verified, test safely with short timeout
+  const now = Date.now();
+  if (dbConnectedCached !== null && now - lastDbCheckTime < DB_CHECK_TTL) {
+    return dbConnectedCached;
   }
   try {
     await prisma.$queryRaw`SELECT 1`;
+    dbConnectedCached = true;
+    lastDbCheckTime = now;
     return true;
   } catch {
+    dbConnectedCached = false;
+    lastDbCheckTime = now;
     return false;
   }
 }
