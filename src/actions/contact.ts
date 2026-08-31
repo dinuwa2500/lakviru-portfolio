@@ -64,13 +64,17 @@ export async function submitContactFormAction(prevState: any, formData: FormData
       ipHash: ip.slice(0, 15),
     });
 
-    // Send immediate email notification to your Gmail via HTTP REST API (non-blocking)
-    sendEmailNotification({
-      name: rawData.name,
-      email: rawData.email,
-      subject: rawData.subject,
-      message: rawData.message,
-    }).catch((err) => console.warn('Email notification error:', err));
+    // Await email dispatch so Vercel serverless function does not freeze before HTTP fetch finishes
+    try {
+      await sendEmailNotification({
+        name: rawData.name,
+        email: rawData.email,
+        subject: rawData.subject,
+        message: rawData.message,
+      });
+    } catch (emailErr) {
+      console.warn('Email dispatch warning (stored safely in DB):', emailErr);
+    }
 
     return {
       success: true,
