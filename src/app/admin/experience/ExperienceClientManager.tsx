@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { Plus, Edit, Trash2, CheckCircle2, Calendar, MapPin } from 'lucide-react';
+import { Plus, Edit, Trash2, CheckCircle2, Calendar, MapPin, X, PlusCircle } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
 import { Input } from '@/components/ui/Input';
@@ -29,7 +29,7 @@ export function ExperienceClientManager({ initialExperiences }: ExperienceClient
   const [endDate, setEndDate] = React.useState('');
   const [isCurrent, setIsCurrent] = React.useState(false);
   const [description, setDescription] = React.useState('');
-  const [responsibilitiesText, setResponsibilitiesText] = React.useState('');
+  const [responsibilities, setResponsibilities] = React.useState<string[]>([]);
   const [achievementsText, setAchievementsText] = React.useState('');
   const [technologiesText, setTechnologiesText] = React.useState('');
   const [displayOrder, setDisplayOrder] = React.useState(1);
@@ -38,14 +38,21 @@ export function ExperienceClientManager({ initialExperiences }: ExperienceClient
     setEditingExp(null);
     setCompany('');
     setPosition('');
-    setLocation('');
-    setStartDate('2024-01');
-    setEndDate('');
+    setLocation('Piliyandala, Sri Lanka');
+    setStartDate('2026-01-02');
+    setEndDate('2026-07-10');
     setIsCurrent(false);
     setDescription('');
-    setResponsibilitiesText('');
+    setResponsibilities([
+      'Integrated UI/UX designs into responsive and functional frontend interfaces.',
+      'Contributed to Flutter mobile application development and implementation of application features.',
+      'Integrated Firebase services into mobile applications where required.',
+      'Worked with Docker for containerized application development and environment management.',
+      'Contributed to Server-Sent Events (SSE) integration to support real-time data updates and communication.',
+      'Collaborated on frontend and mobile application development tasks and contributed to the implementation of software features.',
+    ]);
     setAchievementsText('');
-    setTechnologiesText('TypeScript, Next.js, PostgreSQL');
+    setTechnologiesText('Flutter, Firebase, Docker, Server-Sent Events (SSE), Frontend UI/UX');
     setDisplayOrder(experiences.length + 1);
     setIsModalOpen(true);
   };
@@ -59,11 +66,27 @@ export function ExperienceClientManager({ initialExperiences }: ExperienceClient
     setEndDate(exp.endDate || '');
     setIsCurrent(exp.isCurrent || false);
     setDescription(exp.description);
-    setResponsibilitiesText((exp.responsibilities || []).join('\n'));
+    setResponsibilities(exp.responsibilities && exp.responsibilities.length > 0 ? [...exp.responsibilities] : []);
     setAchievementsText((exp.achievements || []).join('\n'));
     setTechnologiesText((exp.technologies || []).join(', '));
     setDisplayOrder(exp.displayOrder || 1);
     setIsModalOpen(true);
+  };
+
+  const handleAddResponsibility = () => {
+    setResponsibilities((prev) => [...prev, '']);
+  };
+
+  const handleUpdateResponsibility = (index: number, value: string) => {
+    setResponsibilities((prev) => {
+      const copy = [...prev];
+      copy[index] = value;
+      return copy;
+    });
+  };
+
+  const handleRemoveResponsibility = (index: number) => {
+    setResponsibilities((prev) => prev.filter((_, i) => i !== index));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -71,8 +94,7 @@ export function ExperienceClientManager({ initialExperiences }: ExperienceClient
     if (!company.trim() || !position.trim()) return;
 
     setIsSaving(true);
-    const respArray = responsibilitiesText
-      .split('\n')
+    const cleanResponsibilities = responsibilities
       .map((r) => r.trim())
       .filter(Boolean);
     const achArray = achievementsText
@@ -94,7 +116,7 @@ export function ExperienceClientManager({ initialExperiences }: ExperienceClient
           endDate: isCurrent ? null : endDate || null,
           isCurrent,
           description,
-          responsibilities: respArray,
+          responsibilities: cleanResponsibilities,
           achievements: achArray,
           technologies: techArray,
           displayOrder: Number(displayOrder),
@@ -112,7 +134,7 @@ export function ExperienceClientManager({ initialExperiences }: ExperienceClient
           endDate: isCurrent ? null : endDate || null,
           isCurrent,
           description,
-          responsibilities: respArray,
+          responsibilities: cleanResponsibilities,
           achievements: achArray,
           technologies: techArray,
           displayOrder: Number(displayOrder),
@@ -154,7 +176,7 @@ export function ExperienceClientManager({ initialExperiences }: ExperienceClient
             Work Experience Timeline ({experiences.length})
           </h2>
           <p className="text-xs text-zinc-500 dark:text-zinc-400">
-            Manage your employment history, roles, achievements, and tech stack tags
+            Manage your employment history, roles, key responsibilities, and tech stack tags
           </p>
         </div>
         <Button onClick={openAddModal} variant="primary" size="sm" className="gap-1.5">
@@ -163,19 +185,24 @@ export function ExperienceClientManager({ initialExperiences }: ExperienceClient
         </Button>
       </div>
 
-      {/* Experience List */}
+      {/* Experience List Cards */}
       <div className="space-y-4">
         {experiences.map((exp) => (
           <div
             key={exp.id}
-            className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white/70 dark:bg-zinc-900/70 backdrop-blur-md p-6 space-y-3 shadow-sm"
+            className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5 space-y-3.5 shadow-sm"
           >
             <div className="flex items-start justify-between gap-4">
               <div>
-                <h3 className="text-base font-bold text-zinc-900 dark:text-zinc-100">
-                  {exp.position} &mdash; <span className="text-indigo-600 dark:text-indigo-400">{exp.company}</span>
-                </h3>
-                <div className="flex items-center gap-3 text-xs text-zinc-500 mt-1 font-mono">
+                <div className="flex items-center gap-2">
+                  <h3 className="font-bold text-zinc-900 dark:text-zinc-100 text-base">
+                    {exp.position}
+                  </h3>
+                  <span className="text-xs font-semibold text-indigo-600 dark:text-indigo-400">
+                    @{exp.company}
+                  </span>
+                </div>
+                <div className="flex items-center gap-3 text-xs text-zinc-500 dark:text-zinc-400 mt-1 font-mono">
                   <span className="flex items-center gap-1">
                     <Calendar className="h-3.5 w-3.5" />
                     {formatDate(exp.startDate)} &mdash; {exp.isCurrent ? 'Present' : formatDate(exp.endDate)}
@@ -195,19 +222,30 @@ export function ExperienceClientManager({ initialExperiences }: ExperienceClient
                 </Button>
                 <button
                   onClick={() => handleDelete(exp.id)}
-                  className="p-1.5 rounded-lg text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors"
+                  className="p-1.5 rounded-lg text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors cursor-pointer"
                 >
                   <Trash2 className="h-3.5 w-3.5" />
                 </button>
               </div>
             </div>
 
+            {exp.description ? (
+              <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">
+                {exp.description}
+              </p>
+            ) : null}
+
             {exp.responsibilities && exp.responsibilities.length > 0 && (
-              <ul className="text-xs text-zinc-600 dark:text-zinc-400 space-y-1 list-disc list-inside">
-                {exp.responsibilities.map((r, i) => (
-                  <li key={i}>{r}</li>
-                ))}
-              </ul>
+              <div className="space-y-1.5 pt-1">
+                <span className="text-[11px] font-mono font-semibold uppercase tracking-wider text-zinc-500">
+                  Key Responsibilities ({exp.responsibilities.length}):
+                </span>
+                <ul className="text-xs text-zinc-600 dark:text-zinc-400 space-y-1 list-disc list-inside">
+                  {exp.responsibilities.map((r, i) => (
+                    <li key={i} className="leading-relaxed">{r}</li>
+                  ))}
+                </ul>
+              </div>
             )}
 
             {exp.technologies && exp.technologies.length > 0 && (
@@ -233,44 +271,44 @@ export function ExperienceClientManager({ initialExperiences }: ExperienceClient
         title={editingExp ? 'Edit Experience' : 'Add New Position'}
         maxWidth="lg"
       >
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4 max-h-[80vh] overflow-y-auto pr-1">
           <div className="grid grid-cols-2 gap-4">
             <Input
               label="Position / Role Title"
               value={position}
               onChange={(e) => setPosition(e.target.value)}
-              placeholder="e.g. Senior Software Engineer"
+              placeholder="e.g. Software Engineering Intern"
               required
             />
             <Input
-              label="Company / Organization"
+              label="Company Name"
               value={company}
               onChange={(e) => setCompany(e.target.value)}
-              placeholder="e.g. Company Name"
+              placeholder="e.g. VVH Solutions"
               required
             />
           </div>
 
           <div className="grid grid-cols-3 gap-4">
             <Input
-              label="Start Date (YYYY-MM)"
+              label="Start Date"
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
-              placeholder="2023-08"
+              placeholder="2026-01-02"
               required
             />
             <Input
-              label="End Date (YYYY-MM)"
+              label="End Date"
               value={endDate}
               disabled={isCurrent}
               onChange={(e) => setEndDate(e.target.value)}
-              placeholder="2024-05"
+              placeholder="2026-07-10"
             />
             <Input
               label="Location"
               value={location}
               onChange={(e) => setLocation(e.target.value)}
-              placeholder="Remote / Colombo"
+              placeholder="Piliyandala, Sri Lanka"
             />
           </div>
 
@@ -289,30 +327,65 @@ export function ExperienceClientManager({ initialExperiences }: ExperienceClient
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             rows={2}
-            placeholder="Describe your role or leave empty..."
+            placeholder="Overview or leave empty..."
           />
 
-          <Textarea
-            label="Key Responsibilities (1 per line)"
-            value={responsibilitiesText}
-            onChange={(e) => setResponsibilitiesText(e.target.value)}
-            rows={3}
-            placeholder="Architected distributed message brokers&#10;Optimized PostgreSQL database query latency"
-          />
+          {/* Editable Responsibilities List */}
+          <div className="space-y-2 pt-2 border-t border-zinc-200 dark:border-zinc-800">
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">
+                Key Responsibilities ({responsibilities.length})
+              </label>
+              <button
+                type="button"
+                onClick={handleAddResponsibility}
+                className="inline-flex items-center gap-1 text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 cursor-pointer"
+              >
+                <PlusCircle className="h-3.5 w-3.5" />
+                <span>Add Item</span>
+              </button>
+            </div>
+
+            <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
+              {responsibilities.map((resp, index) => (
+                <div key={index} className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    value={resp}
+                    onChange={(e) => handleUpdateResponsibility(index, e.target.value)}
+                    placeholder={`Responsibility #${index + 1}`}
+                    className="flex-1 px-3 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 text-xs text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveResponsibility(index)}
+                    className="p-1.5 rounded-md text-zinc-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors cursor-pointer"
+                    title="Remove item"
+                  >
+                    <X className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+              ))}
+
+              {responsibilities.length === 0 && (
+                <p className="text-xs text-zinc-400 italic">No responsibilities added yet.</p>
+              )}
+            </div>
+          </div>
 
           <Textarea
-            label="Key Achievements / Milestones (1 per line)"
+            label="Key Achievements / Milestones (Optional, 1 per line)"
             value={achievementsText}
             onChange={(e) => setAchievementsText(e.target.value)}
             rows={2}
-            placeholder="Reduced P99 latency by 45%&#10;Zero downtime deployment"
+            placeholder="Leave empty or add genuine milestones..."
           />
 
           <Input
             label="Technologies Used (comma separated)"
             value={technologiesText}
             onChange={(e) => setTechnologiesText(e.target.value)}
-            placeholder="TypeScript, Docker, Redis, PostgreSQL"
+            placeholder="Flutter, Firebase, Docker, Server-Sent Events (SSE), Frontend UI/UX"
           />
 
           <div className="flex justify-end gap-3 pt-4 border-t border-zinc-200 dark:border-zinc-800">
