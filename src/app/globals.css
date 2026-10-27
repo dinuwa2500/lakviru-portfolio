@@ -75,33 +75,56 @@ body {
   background: rgba(161, 161, 170, 0.4);
 }
 
-/* Hide default cursor on desktop pointer devices on public pages so custom motion icon is active */
+/* ─── Cursor spotlight overlay ────────────────────────────────────────────
+   The .cursor-spotlight div reads --cx / --cy set by CursorSpotlight.tsx
+   via requestAnimationFrame. The radial-gradient is GPU-composited and
+   causes no layout reflow. Native OS cursor is fully restored.
+   ───────────────────────────────────────────────────────────────────────── */
 @media (pointer: fine) {
-  body:not(.admin-page),
-  body:not(.admin-page) a:not(.admin-page *),
-  body:not(.admin-page) button:not(.admin-page *),
-  body:not(.admin-page) input:not(.admin-page *),
-  body:not(.admin-page) select:not(.admin-page *),
-  body:not(.admin-page) textarea:not(.admin-page *),
-  body:not(.admin-page) [role="button"]:not(.admin-page *),
-  body:not(.admin-page) label:not(.admin-page *) {
-    cursor: none !important;
+  /* Restore proper native cursor semantics on all public pages */
+  body {
+    cursor: default;
+  }
+  a,
+  button,
+  [role="button"],
+  select,
+  label[for],
+  summary {
+    cursor: pointer;
+  }
+  input,
+  textarea {
+    cursor: text;
+  }
+  input[type="checkbox"],
+  input[type="radio"],
+  input[type="range"] {
+    cursor: pointer;
+  }
+  [disabled],
+  [aria-disabled="true"] {
+    cursor: not-allowed;
   }
 
-  /* Explicit normal standard cursor for Admin pages */
-  .admin-page,
-  .admin-page * {
-    cursor: auto !important;
+  /* Spotlight overlay — reads CSS custom properties updated by CursorSpotlight.tsx */
+  .cursor-spotlight {
+    --cx: -500px;
+    --cy: -500px;
+    background: radial-gradient(
+      600px circle at var(--cx) var(--cy),
+      rgba(99, 102, 241, 0.06) 0%,
+      transparent 80%
+    );
+    transition: opacity 0.4s ease;
   }
-  .admin-page a,
-  .admin-page button,
-  .admin-page [role="button"],
-  .admin-page select {
-    cursor: pointer !important;
-  }
-  .admin-page input,
-  .admin-page textarea {
-    cursor: text !important;
+
+  .dark .cursor-spotlight {
+    background: radial-gradient(
+      600px circle at var(--cx) var(--cy),
+      rgba(99, 102, 241, 0.10) 0%,
+      transparent 80%
+    );
   }
 }
 
