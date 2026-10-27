@@ -115,7 +115,7 @@ body {
   label[for],
   summary,
   [class*="cursor-pointer"] {
-    cursor: url('/cursors/pointer.svg') 10 3, pointer;
+    cursor: url('/cursors/pointer.svg') 9 1, pointer;
   }
 
   /* Text I-beam — hotspot at vertical center (10, 14) */

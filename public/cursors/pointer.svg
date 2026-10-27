@@ -1,29 +1,68 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" fill="none">
+<svg xmlns="http://www.w3.org/2000/svg" width="28" height="36" viewBox="0 0 22 34" fill="none">
   <defs>
-    <filter id="s" x="-30%" y="-30%" width="160%" height="160%">
-      <feDropShadow dx="0" dy="0" stdDeviation="2" flood-color="#6366f1" flood-opacity="0.5"/>
+    <!-- Subtle light-to-dark gradient for 3D depth -->
+    <linearGradient id="grad" x1="30%" y1="0%" x2="70%" y2="100%">
+      <stop offset="0%" stop-color="#a5b4fc"/>
+      <stop offset="100%" stop-color="#4338ca"/>
+    </linearGradient>
+    <!-- Indigo glow shadow -->
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="1" stdDeviation="1.8" flood-color="#6366f1" flood-opacity="0.55"/>
     </filter>
   </defs>
-  <!-- White outline layer -->
-  <g stroke="white" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" fill="white">
-    <!-- Index finger -->
-    <path d="M10 3 C10 3 10 2 11.5 2 C13 2 13 3 13 3 L13 13"/>
-    <!-- Middle finger -->
-    <path d="M13 8 C13 8 13 7 14.5 7 C16 7 16 8 16 8 L16 14"/>
-    <!-- Ring finger -->
-    <path d="M16 9.5 C16 9.5 16 8.5 17.5 8.5 C19 8.5 19 9.5 19 9.5 L19 15"/>
-    <!-- Palm + pinky -->
-    <path d="M10 3 L10 18 C10 18 9 22 10 24 C11 26 13 27 16 27 C19 27 21 26 21.5 24 C22 22 19 15 19 15"/>
+
+  <!--
+    Classic browser hand cursor shape.
+    Index finger tip = hotspot → top of the M path at (7,1).
+    In 28×36 px output (viewBox 0 0 22 34): hotspot CSS = "9 1"
+
+    Path traces the full hand silhouette clockwise:
+      · Left side of index finger up to tip
+      · Tip arc
+      · Right side of index back down
+      · Middle + ring finger tops (curled, shorter)
+      · Palm right side
+      · Palm bottom (rounded)
+      · Thumb protrusion on the left
+      · Back up the left palm to index base
+  -->
+
+  <!-- White outline — renders first so it appears behind the fill -->
+  <path
+    d="M7,1 C5.9,1 5,1.9 5,3 L5,16.5 C4,16 2.8,15.5 2,15.5 C0.9,15.5 0,16.4 0,17.5 L0,21 C0,23 0.8,24.8 2,26 L6,30 C7.5,31.8 9.2,33 12,33 C17.5,33 21,29 21,24 L21,11 C21,9.9 20.1,9 19,9 C18.3,9 17.7,9.3 17.3,9.8 C16.9,8.7 15.9,8 14.7,8 C13.9,8 13.2,8.4 12.8,9 C12.3,8.4 11.6,8 10.8,8 C10.1,8 9.4,8.3 9,8.8 L9,3 C9,1.9 8.1,1 7,1 Z"
+    fill="white"
+    stroke="white"
+    stroke-width="2.2"
+    stroke-linejoin="round"
+    stroke-linecap="round"
+  />
+
+  <!-- Indigo gradient fill -->
+  <path
+    d="M7,1 C5.9,1 5,1.9 5,3 L5,16.5 C4,16 2.8,15.5 2,15.5 C0.9,15.5 0,16.4 0,17.5 L0,21 C0,23 0.8,24.8 2,26 L6,30 C7.5,31.8 9.2,33 12,33 C17.5,33 21,29 21,24 L21,11 C21,9.9 20.1,9 19,9 C18.3,9 17.7,9.3 17.3,9.8 C16.9,8.7 15.9,8 14.7,8 C13.9,8 13.2,8.4 12.8,9 C12.3,8.4 11.6,8 10.8,8 C10.1,8 9.4,8.3 9,8.8 L9,3 C9,1.9 8.1,1 7,1 Z"
+    fill="url(#grad)"
+    stroke="#4338ca"
+    stroke-width="0.4"
+    stroke-linejoin="round"
+    filter="url(#glow)"
+  />
+
+  <!-- Knuckle crease lines between fingers for realism -->
+  <g stroke="rgba(255,255,255,0.45)" stroke-width="0.8" stroke-linecap="round">
+    <!-- Between index and middle -->
+    <line x1="9" y1="9" x2="9" y2="11"/>
+    <!-- Between middle and ring -->
+    <line x1="13" y1="9" x2="13" y2="11"/>
+    <!-- Between ring and pinky area -->
+    <line x1="17" y1="10" x2="17" y2="12"/>
   </g>
-  <!-- Indigo fill layer -->
-  <g fill="#6366f1" stroke="#4f46e5" stroke-width="0.75" stroke-linejoin="round" stroke-linecap="round" filter="url(#s)">
-    <!-- Index finger -->
-    <path d="M10 3 C10 3 10 2 11.5 2 C13 2 13 3 13 3 L13 13"/>
-    <!-- Middle finger -->
-    <path d="M13 8 C13 8 13 7 14.5 7 C16 7 16 8 16 8 L16 14"/>
-    <!-- Ring finger -->
-    <path d="M16 9.5 C16 9.5 16 8.5 17.5 8.5 C19 8.5 19 9.5 19 9.5 L19 15"/>
-    <!-- Palm + pinky -->
-    <path d="M10 3 L10 18 C10 18 9 22 10 24 C11 26 13 27 16 27 C19 27 21 26 21.5 24 C22 22 19 15 19 15"/>
-  </g>
+
+  <!-- Highlight sheen on index finger for premium 3D feel -->
+  <line
+    x1="6.2" y1="3"
+    x2="6.2" y2="14"
+    stroke="rgba(255,255,255,0.35)"
+    stroke-width="1"
+    stroke-linecap="round"
+  />
 </svg>
