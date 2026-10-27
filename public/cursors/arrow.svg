@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" fill="none">
+  <defs>
+    <filter id="s" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="0" stdDeviation="2" flood-color="#6366f1" flood-opacity="0.5"/>
+    </filter>
+  </defs>
+  <!-- White outline layer for contrast on any background -->
+  <path
+    d="M4 2 L4 22 L8 17.5 L12.5 27.5 L15.5 26 L11 16 L18.5 16 Z"
+    fill="white"
+    stroke="white"
+    stroke-width="2.5"
+    stroke-linejoin="round"
+    stroke-linecap="round"
+  />
+  <!-- Indigo fill layer -->
+  <path
+    d="M4 2 L4 22 L8 17.5 L12.5 27.5 L15.5 26 L11 16 L18.5 16 Z"
+    fill="#6366f1"
+    stroke="#4f46e5"
+    stroke-width="0.75"
+    stroke-linejoin="round"
+    stroke-linecap="round"
+    filter="url(#s)"
+  />
+</svg>

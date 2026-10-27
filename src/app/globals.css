@@ -101,6 +101,35 @@ body {
   input[type="checkbox"], input[type="radio"], input[type="range"] { cursor: pointer; }
   [disabled], [aria-disabled="true"] { cursor: not-allowed; }
 
+  /* ── Custom indigo cursor icons ────────────────────────────────────────── */
+  /* Default arrow — hotspot at tip (4, 2) */
+  html, body {
+    cursor: url('/cursors/arrow.svg') 4 2, default;
+  }
+
+  /* Pointer (hand) — hotspot at index fingertip (10, 3) */
+  a,
+  button,
+  [role="button"],
+  select,
+  label[for],
+  summary,
+  [class*="cursor-pointer"] {
+    cursor: url('/cursors/pointer.svg') 10 3, pointer;
+  }
+
+  /* Text I-beam — hotspot at vertical center (10, 14) */
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="submit"]):not([type="button"]):not([type="reset"]):not([type="file"]),
+  textarea {
+    cursor: url('/cursors/text.svg') 10 14, text;
+  }
+
+  /* Disabled — keep system not-allowed */
+  [disabled],
+  [aria-disabled="true"] {
+    cursor: not-allowed;
+  }
+
   /* ── Trailing glow ring ────────────────────────────────────────────────── */
   .cursor-ring {
     position: fixed;

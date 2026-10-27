@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="28" viewBox="0 0 20 28" fill="none">
+  <defs>
+    <filter id="s" x="-40%" y="-40%" width="180%" height="180%">
+      <feDropShadow dx="0" dy="0" stdDeviation="1.5" flood-color="#6366f1" flood-opacity="0.5"/>
+    </filter>
+  </defs>
+  <!-- White outline -->
+  <g stroke="white" stroke-width="2.5" stroke-linecap="round">
+    <!-- Top crossbar -->
+    <line x1="4" y1="4" x2="16" y2="4"/>
+    <!-- Vertical stem -->
+    <line x1="10" y1="4" x2="10" y2="24"/>
+    <!-- Bottom crossbar -->
+    <line x1="4" y1="24" x2="16" y2="24"/>
+  </g>
+  <!-- Indigo fill -->
+  <g stroke="#6366f1" stroke-width="2" stroke-linecap="round" filter="url(#s)">
+    <line x1="4" y1="4" x2="16" y2="4"/>
+    <line x1="10" y1="4" x2="10" y2="24"/>
+    <line x1="4" y1="24" x2="16" y2="24"/>
+  </g>
+</svg>

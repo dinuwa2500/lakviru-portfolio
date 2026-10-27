@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" fill="none">
+  <defs>
+    <filter id="s" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="0" stdDeviation="2" flood-color="#6366f1" flood-opacity="0.5"/>
+    </filter>
+  </defs>
+  <!-- White outline layer -->
+  <g stroke="white" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" fill="white">
+    <!-- Index finger -->
+    <path d="M10 3 C10 3 10 2 11.5 2 C13 2 13 3 13 3 L13 13"/>
+    <!-- Middle finger -->
+    <path d="M13 8 C13 8 13 7 14.5 7 C16 7 16 8 16 8 L16 14"/>
+    <!-- Ring finger -->
+    <path d="M16 9.5 C16 9.5 16 8.5 17.5 8.5 C19 8.5 19 9.5 19 9.5 L19 15"/>
+    <!-- Palm + pinky -->
+    <path d="M10 3 L10 18 C10 18 9 22 10 24 C11 26 13 27 16 27 C19 27 21 26 21.5 24 C22 22 19 15 19 15"/>
+  </g>
+  <!-- Indigo fill layer -->
+  <g fill="#6366f1" stroke="#4f46e5" stroke-width="0.75" stroke-linejoin="round" stroke-linecap="round" filter="url(#s)">
+    <!-- Index finger -->
+    <path d="M10 3 C10 3 10 2 11.5 2 C13 2 13 3 13 3 L13 13"/>
+    <!-- Middle finger -->
+    <path d="M13 8 C13 8 13 7 14.5 7 C16 7 16 8 16 8 L16 14"/>
+    <!-- Ring finger -->
+    <path d="M16 9.5 C16 9.5 16 8.5 17.5 8.5 C19 8.5 19 9.5 19 9.5 L19 15"/>
+    <!-- Palm + pinky -->
+    <path d="M10 3 L10 18 C10 18 9 22 10 24 C11 26 13 27 16 27 C19 27 21 26 21.5 24 C22 22 19 15 19 15"/>
+  </g>
+</svg>
